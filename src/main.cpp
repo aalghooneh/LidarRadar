@@ -32,17 +32,17 @@ void parser(int argc, char** argv, std::string& PCtopic){
 }
 
 void PCcallback( const sensor_msgs::PointCloud2::ConstPtr& pcmsg){
-    pcl::PointCloud<pcl::PointXYZ> pclCloud;
-    pcl::fromROSMsg(*pcmsg, pclCloud);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr pclCloud;
+    pcl::fromROSMsg(*pcmsg, *pclCloud);
 
-    std::cout<<"The cloud size is ...."<< pclCloud.size()<<std::endl;
+    std::cout<<"The cloud size is ...."<< pclCloud->size()<<std::endl;
 
 
     pcl::PointIndices::Ptr groundIndices(new pcl::PointIndices);
-    pcl::ModelCoefficients::Ptr Coeffsground(new pcl::PointIndices);
+    pcl::ModelCoefficients::Ptr Coeffsground(new pcl::ModelCoefficients);
 
     pcl::SACSegmentation<pcl::PointXYZ> groundSegmentor;
-    
+
     groundSegmentor.setOptimizeCoefficients(true);
     groundSegmentor.setModelType(pcl::SACMODEL_PLANE);
     groundSegmentor.setMethodType(pcl::SAC_RANSAC);
@@ -53,7 +53,7 @@ void PCcallback( const sensor_msgs::PointCloud2::ConstPtr& pcmsg){
     auto start = std::chrono::steady_clock::now();
     groundSegmentor.segment(*groundIndices, *Coeffsground);
     auto end = std::chrono::steady_clock::now();
-    
+
     std::cout<< std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << std::endl;
     
 
